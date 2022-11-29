@@ -1,0 +1,140 @@
+int wwidth = 1920;
+int wheight = 1080;
+
+final SceneManager sceneManager = new SceneManager();
+final InventoryManager inventoryManager = new InventoryManager();
+final LettersManager lettersManager = new LettersManager();
+
+
+void settings()
+{
+  size(wwidth, wheight);
+}
+void setup()
+{
+  GameObject replacebrush1 = new GameObject("ReplaceBrush1", 50, 50, "Brush1.PNG");
+  GameObject replacebrush2 = new GameObject("ReplaceBrush2", 50, 50, "Brush2.PNG");
+  GameObject replaceGoblet = new GameObject("replaceGoblet", 50, 50, "Goblet.PNG");
+  GameObject inventory = new GameObject("Inventory", 80, 32, 500, 100, "Inventory.PNG");
+
+  Collectable bloodbrush = new Collectable("BloodBrush", "BloodBrush.PNG");
+  Collectable waterbrush = new Collectable("WaterBrush", "WaterBrush.PNG");
+  Collectable bloodgoblet = new Collectable("BloodGoblet", "BloodGoblet.PNG");
+  Collectable watergoblet = new Collectable("WaterGoblet", "WaterGoblet.PNG");
+  Collectable brush1 = new Collectable("Brush1", "Brush1.PNG");
+  Collectable brush2 = new Collectable("Brush2", "Brush2.PNG");
+  Collectable goblet = new Collectable("goblet", "Goblet.PNG");
+
+  GameObject letterGCopy = new GameObject("LetterGCopy", 100, 100, "Letter_G.PNG");
+  GameObject letterOCopy = new GameObject("LetterOCopy", 100, 100, "Letter_O.PNG");
+  GameObject letterBCopy = new GameObject("LetterBCopy", 100, 100, "Letter_B.PNG");
+  GameObject letterLCopy = new GameObject("LetterLCopy", 100, 100, "Letter_L.PNG");
+  GameObject letterECopy = new GameObject("LetterECopy", 100, 100, "Letter_E.PNG");
+  GameObject letterTCopy = new GameObject("LetterTCopy", 100, 100, "Letter_T.PNG");
+
+
+  Scene scene01 = new Scene("scene01", "MainRoom.JPEG");
+  MoveToSceneObject board = new MoveToSceneObject ("board", 860, 740, 100, 70, "Board.PNG", "scene04");
+  scene01.addGameObject(board);
+  MoveToSceneObject painting = new MoveToSceneObject("painting", 709, 88, 400, 400, "Painting.PNG", "scene05");
+  scene01.addGameObject(painting);
+  MoveToSceneObject rightArrow01 = new MoveToSceneObject ("rightArrowMain", 1804, 332, 100, 300, "RightArrow.PNG", "scene02");
+  scene01.addGameObject(rightArrow01);
+  MoveToSceneObject leftArrow01 = new MoveToSceneObject ("leftArrowMain", 60, 369, 100, 300, "LeftArrow.PNG", "scene03");
+  scene01.addGameObject(leftArrow01);
+  CollectableObject object01 = new CollectableObject("brush1_scene01", 1120, 781, 50, 50, brush1, replacebrush1);
+  scene01.addGameObject(object01);
+  CollectableObject object02 = new CollectableObject("brush2_scene01", 645, 775, 50, 50, brush2, replacebrush2);
+  scene01.addGameObject(object02);
+  CollectableObject object03 = new CollectableObject("goblet_scene01", 860, 740, 50, 50, goblet, replaceGoblet);
+
+  scene01.addGameObject(inventory);
+
+
+  Scene scene02 = new Scene("scene02", "RightRoom.JPEG");
+  MoveToSceneObject leftArrow02 = new MoveToSceneObject ("leftArrowRightRoom", 60, 369, 100, 300, "LeftArrow.PNG", "scene01");
+  scene02.addGameObject(leftArrow02);
+  GameObject waterBowl = new GameObject("EmptyWaterBowl", 430, 940, 100, 50, "EmptyWaterBowl.PNG");
+  scene02.addGameObject(waterBowl);
+  GameObject bloodBowl = new GameObject("EmptyBloodBowl", 1300, 930, 100, 50, "EmptyBloodBowl.PNG");
+  scene02.addGameObject(bloodBowl);
+  scene02.addGameObject(inventory);
+
+
+
+
+
+
+  Scene scene03 = new Scene("scene03", "LeftRoom.JPEG");
+  MoveToSceneObject rightArrow02 = new MoveToSceneObject ("rightArrowLeftRoom", 1804, 332, 100, 300, "RightArrow.PNG", "scene01");
+  scene03.addGameObject(rightArrow02);
+  GameObject water = new GameObject("Water", 371, 970, 200, 50, "Water.PNG");
+  scene03.addGameObject(water);
+  GameObject blood = new GameObject("Blood", 1600, 970, 200, 50, "Blood.PNG");
+  scene03.addGameObject(blood);
+  GameObject portal = new GameObject("Portal", 900, 940, 200, 100, "PentagramPortal.PNG");
+  //scene03.addGameObject(portal);
+  scene03.addGameObject(inventory);
+
+
+  Scene scene04 = new Scene("scene04", "CloseBoard.JPEG");
+  MoveToSceneObject downArrow01 = new MoveToSceneObject("downArrowBoard", 800, 900, 300, 100, "DownArrow.PNG", true);
+  scene04.addGameObject(downArrow01);
+  GameObject letterG = new GameObject("LetterG", 534, 614, 50, 50, "Letter_G.PNG", true, letterGCopy);
+  scene04.addGameObject(letterG);
+  GameObject letterO = new GameObject("LetterO", 705, 721, 50, 50, "Letter_O.PNG", true, letterOCopy);
+  scene04.addGameObject(letterO);
+  GameObject letterB = new GameObject("LetterB", 1117, 625, 50, 50, "Letter_B.PNG", true, letterBCopy);
+  scene04.addGameObject(letterB);
+  GameObject letterL = new GameObject("LetterL", 1327, 848, 50, 50, "Letter_L.PNG", true, letterLCopy);
+  scene04.addGameObject(letterL);
+  GameObject letterE = new GameObject("LetterE", 959, 780, 50, 50, "Letter_E.PNG", true, letterECopy);
+  scene04.addGameObject(letterE);
+  GameObject letterT = new GameObject("LetterT", 568, 889, 50, 50, "Letter_T.PNG", true, letterTCopy);
+  scene04.addGameObject(letterT);
+  GameObject eraser = new GameObject("Eraser", 1395, 567, 50, 50, "Eraser.PNG", true, board, object03);
+  scene04.addGameObject(eraser);
+  scene04.addGameObject(inventory);
+
+  Scene scene05 = new Scene("scene05", "ClosePainting.JPEG");
+  MoveToSceneObject downArrow02 = new MoveToSceneObject("downArrowPainting", 800, 900, 300, 100, "DownArrow.PNG", true);
+  scene05.addGameObject(downArrow02);
+  scene05.addGameObject(inventory);
+
+
+
+  sceneManager.addScene(scene01);
+  sceneManager.addScene(scene02);
+  sceneManager.addScene(scene03);
+  sceneManager.addScene(scene04);
+  sceneManager.addScene(scene05);
+}
+
+void draw()
+{
+  sceneManager.getCurrentScene().draw(wwidth, wheight);
+  sceneManager.getCurrentScene().updateScene();
+  inventoryManager.clearMarkedForDeathCollectables();
+  inventoryManager.clearMarkedForDeathItems();
+}
+
+void mouseMoved() {
+  sceneManager.getCurrentScene().mouseMoved();
+}
+void mouseClicked() {
+  sceneManager.getCurrentScene().mouseClicked();
+}
+void mousePressed()
+{
+  println(mouseX);
+  println(mouseY);
+}
+void mouseDragged()
+{
+  sceneManager.getCurrentScene().mouseDragged();
+}
+
+void mouseReleased()
+{
+  sceneManager.getCurrentScene().mouseReleased();
+}
