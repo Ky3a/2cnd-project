@@ -1,0 +1,86 @@
+int wwidth = 1920;
+int wheight = 1080;
+
+final SceneManager sceneManager = new SceneManager();
+final InventoryManager inventoryManager = new InventoryManager();
+
+void settings()
+{
+  size(wwidth, wheight);
+}
+
+void setup()
+{
+  Collectable firstGem = new Collectable("firstGem", "activeGem.png");
+  
+  Scene portal0 = new Scene("portal0", "portal0.png");
+  MoveToSceneObject leftArrowPortal = new MoveToSceneObject("goToLab", 0, 0, 0, 0, "left.png", "lab0");
+  portal0.addGameObject(leftArrowPortal);
+  MoveToSceneObject rightArrowPortal = new MoveToSceneObject("goToRight", 0, 0, 0, 0, "right.png", "greenhouse0");
+  portal0.addGameObject(rightArrowPortal);
+  // check for gem to switch to portal1
+  
+  Scene portal1 = new Scene("portal1", "portal1.png");
+  MoveToSceneObject leftArrowPortal = new MoveToSceneObject("goToLab", 0, 0, 0, 0, "left.png", "lab0");
+  portal0.addGameObject(leftArrowPortal);
+  MoveToSceneObject rightArrowPortal = new MoveToSceneObject("goToRight", 0, 0, 0, 0, "right.png", "greenhouse0");
+  portal0.addGameObject(rightArrowPortal);
+  
+  Scene lab0 = new Scene("lab0", "lab0.png");
+  MoveToSceneObject rightArrowLab = new MoveToSceneObject("goToPortal", 0, 0, 0, 0, "right.png", "portal0");
+  lab0.addGameObject(rightArrowLab);
+  MoveToSceneObject potionShelf = new MoveToSceneObject("goToPotion", 0, 0, 0, 0, "potions.png", "potions");
+  lab0.addGameObject(potionShelf);
+  MoveToSceneObject lockObject = new MoveToSceneObject("goToLock", 0, 0, 0, 0, "lockClosed.png", "lock");
+  lab0.addGameObject(potionShelf);
+  MoveToSceneObject bookObject = new MoveToSceneObject("goToBook", 0, 0, 0, 0, "book.png", "book");
+  lab0.addGameObject(potionShelf);
+  
+  Scene greenhouse0 = new Scene("greenhouse0", "greenhouse0.png");
+  MoveToSceneObject leftArrowGreenhouse= new MoveToSceneObject("goToPortal", 0, 0, 0, 0, "left.png", "portal0");
+  greenhouse0.addGameObject(leftArrowGreenhouse);
+  
+  Scene potions = new Scene ("potions","potions.png");
+  MoveToSceneObject potionsExit= new MoveToSceneObject("goToLab", 0, 0 0, 0, "exitButton.png", "lab0");
+  potions.addGameObject(potionsExit);
+  
+  Scene lock = new Scene ("lock","lockOverlay.png");
+  MoveToSceneObject lockExit= new MoveToSceneObject("goToLab", 0, 0 0, 0, "exitButton.png", "lab0");
+  lock.addGameObject(lockExit);
+  
+  Scene lockOpen = new Scene ("lockOpen","lockOpenOverlay.png");
+  MoveToSceneObject lockGem= new MoveToSceneObject("goToNoGem", 0, 0 0, 0, "activeGem.png", "LockNoGem");
+  lockOpen.addGameObject(lockGem);
+  lockOpen.addGameObject(lockExit);
+  
+  Scene lockNoGem = new Scene ("lockNoGem","lockOpenNoGemOverlay.png");
+  lockNoGem.addGameObject(lockExit);
+  
+  Scene book = new Scene ("book","bookOverlay.png");
+  MoveToSceneObject bookExit= new MoveToSceneObject("goToLab", 0, 0 0, 0, "exitButton.png", "lab0");
+  book.addGameObject(bookExit);
+  
+  sceneManager.addScene(portal0);
+  sceneManager.addScene(lab0);
+  sceneManager.addScene(greenhouse0);
+  sceneManager.addScene(potions);
+  sceneManager.addScene(lock);
+  sceneManager.addScene(lockOpen);
+  sceneManager.addScene(lockNoGem);
+  sceneManager.addScene(book);
+}
+
+void draw()
+{
+  sceneManager.getCurrentScene().draw(wwidth, wheight);
+  sceneManager.getCurrentScene().updateScene();
+  inventoryManager.clearMarkedForDeathCollectables();
+}
+
+void mouseMoved() {
+  sceneManager.getCurrentScene().mouseMoved();
+}
+
+void mouseClicked() {
+  sceneManager.getCurrentScene().mouseClicked();
+}
