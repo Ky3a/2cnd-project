@@ -11,8 +11,12 @@ void settings()
 
 void setup()
 {
-  Collectable firstGem = new Collectable("firstGem", "activeGem.png");
+  Collectable firstGem = new Collectable("firstGem", "safeClosed.png");
+  //RequireObject loupe01 = new RequireObject("requiresGem1_middle", 510, 880, 50, 50, "inactiveGem.png", "You need to get the other gem in order to activate the portal!", firstGem, object7);
+  //RequireObject loupe02 = new RequireObject("requiresGem2_middle", 510, 1040, 50, 50, "inactiveGem.png", "You need to get the other gem in order to activate the portal!", secondGem, object7);
+  //Collectable secondGem = new Collectable("secondGem", "activeGem.png");
   
+  //Middle room aka portal scene without any gems
   Scene portal0 = new Scene("portal0", "portal0.png");
   MoveToSceneObject leftArrowPortal = new MoveToSceneObject("goToLab", 0, 0, 0, 0, "left.png", "lab0");
   portal0.addGameObject(leftArrowPortal);
@@ -20,12 +24,21 @@ void setup()
   portal0.addGameObject(rightArrowPortal);
   // check for gem to switch to portal1
   
+  /* Middle room with only 1 gem (i think this might be useless and we can just skip to portal2 scene since player must use the 1st gem to get 2nd gem in order to activate the portal
+  + its a pain in the ass to manage scene management after) */
   Scene portal1 = new Scene("portal1", "portal1.png");
-  MoveToSceneObject leftArrowPortal = new MoveToSceneObject("goToLab", 0, 0, 0, 0, "left.png", "lab0");
+  MoveToSceneObject leftArrowPortal1 = new MoveToSceneObject("goToLab", 0, 0, 0, 0, "left.png", "lab0");
   portal0.addGameObject(leftArrowPortal);
-  MoveToSceneObject rightArrowPortal = new MoveToSceneObject("goToRight", 0, 0, 0, 0, "right.png", "greenhouse0");
+  MoveToSceneObject rightArrowPortal1 = new MoveToSceneObject("goToRight", 0, 0, 0, 0, "right.png", "greenhouse0");
   portal0.addGameObject(rightArrowPortal);
+  // check for gem to switch to portal2
   
+  //Middle room with 2 gems
+  Scene portal2 = new Scene("portal2", "portal2.png");
+  
+  //add portal that goes to next lvl
+  
+  //Left room aka lab scene (idk if i should add a scene after the safe gets open and the player grabs the gem)
   Scene lab0 = new Scene("lab0", "lab0.png");
   MoveToSceneObject rightArrowLab = new MoveToSceneObject("goToPortal", 0, 0, 0, 0, "right.png", "portal0");
   lab0.addGameObject(rightArrowLab);
@@ -36,38 +49,57 @@ void setup()
   MoveToSceneObject bookObject = new MoveToSceneObject("goToBook", 0, 0, 0, 0, "book.png", "book");
   lab0.addGameObject(potionShelf);
   
-  Scene greenhouse0 = new Scene("greenhouse0", "greenhouse0.png");
-  MoveToSceneObject leftArrowGreenhouse= new MoveToSceneObject("goToPortal", 0, 0, 0, 0, "left.png", "portal0");
-  greenhouse0.addGameObject(leftArrowGreenhouse);
-  
-  Scene potions = new Scene ("potions","potions.png");
-  MoveToSceneObject potionsExit= new MoveToSceneObject("goToLab", 0, 0 0, 0, "exitButton.png", "lab0");
+  //Potions scene
+  Scene potions = new Scene ("potions","potionsOverlay.png");
+  MoveToSceneObject potionsExit= new MoveToSceneObject("goToLab", 0, 0, 0, 0, "exitButton.png", "lab0");
   potions.addGameObject(potionsExit);
   
+  //Lock scene
   Scene lock = new Scene ("lock","lockOverlay.png");
-  MoveToSceneObject lockExit= new MoveToSceneObject("goToLab", 0, 0 0, 0, "exitButton.png", "lab0");
+  MoveToSceneObject lockExit= new MoveToSceneObject("goToLab", 0, 0, 0, 0, "exitButton.png", "lab0");
   lock.addGameObject(lockExit);
+  //needs working lock that goes to next scene
   
   Scene lockOpen = new Scene ("lockOpen","lockOpenOverlay.png");
-  MoveToSceneObject lockGem= new MoveToSceneObject("goToNoGem", 0, 0 0, 0, "activeGem.png", "LockNoGem");
+  MoveToSceneObject lockGem= new MoveToSceneObject("goToNoGem", 0, 0, 0, 0, "activeGem.png", "LockNoGem");
   lockOpen.addGameObject(lockGem);
   lockOpen.addGameObject(lockExit);
   
   Scene lockNoGem = new Scene ("lockNoGem","lockOpenNoGemOverlay.png");
   lockNoGem.addGameObject(lockExit);
   
+  //Open book scene
   Scene book = new Scene ("book","bookOverlay.png");
-  MoveToSceneObject bookExit= new MoveToSceneObject("goToLab", 0, 0 0, 0, "exitButton.png", "lab0");
+  MoveToSceneObject bookExit= new MoveToSceneObject("goToLab", 0, 0, 0, 0, "exitButton.png", "lab0");
   book.addGameObject(bookExit);
   
+  //Right room aka greenhouse scene with one gem
+  Scene greenhouse0 = new Scene("greenhouse0", "greenhouse0.png");
+  MoveToSceneObject leftArrowGreenhouse= new MoveToSceneObject("goToPortal", 0, 0, 0, 0, "left.png", "portal0");
+  greenhouse0.addGameObject(leftArrowGreenhouse);
+  //needs interactible to place first gem and update scene
+  
+  //Right room 2 gems
+  Scene greenhouse1 = new Scene("greenhouse1", "greenhouse1.png");
+  greenhouse1.addGameObject(leftArrowGreenhouse);
+  //needs something to give players both gems and update scene
+  
+  //Right room without any gems
+  Scene greenhouse2 = new Scene("greenhouse2", "greenhouse2.png");
+  greenhouse2.addGameObject(leftArrowGreenhouse);
+  
   sceneManager.addScene(portal0);
+  sceneManager.addScene(portal1);
+  sceneManager.addScene(portal2);
   sceneManager.addScene(lab0);
-  sceneManager.addScene(greenhouse0);
   sceneManager.addScene(potions);
   sceneManager.addScene(lock);
   sceneManager.addScene(lockOpen);
   sceneManager.addScene(lockNoGem);
   sceneManager.addScene(book);
+  sceneManager.addScene(greenhouse0);
+  sceneManager.addScene(greenhouse1);
+  sceneManager.addScene(greenhouse2);
 }
 
 void draw()
