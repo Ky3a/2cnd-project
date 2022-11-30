@@ -1,3 +1,681 @@
+// class Collectable
+class Collectable {
+  private String name;
+  private String gameObjectImageFile;
+  //Could be expanded to add an amount, for example
+  
+  public Collectable(String name, String gameObjectImageFile) {
+    this.name = name;
+    this.gameObjectImageFile = gameObjectImageFile;
+  }
+  
+  public String getName() { 
+    return name; 
+  }
+  
+  public String getGameObjectImageFile() { 
+    return gameObjectImageFile; 
+  } 
+  
+  @Override 
+  public boolean equals(Object obj) { 
+    if (obj == this) { return true; } 
+    if (obj == null || obj.getClass() != this.getClass()) { return false; } 
+    Collectable otherCollectable = (Collectable) obj; 
+    return otherCollectable.getName().equals(this.name);
+  } 
+
+  @Override 
+  public int hashCode() { 
+    final int prime = 13;
+    return prime * this.name.hashCode();
+  }
+}
+
+
+
+// class CollectableObject
+class CollectableObject extends GameObject {
+  private Collectable collectable;
+  private GameObject replaceWith;
+  private boolean willReplaceByAnotherGameObject;
+
+  public CollectableObject(String identifier, int x, int y, int owidth,
+    int oheight, Collectable collectable) {
+    this(identifier, x, y, owidth, oheight, collectable, null);
+  }
+
+  public CollectableObject(String identifier, int x, int y, int owidth,
+    int oheight, Collectable collectable, GameObject replaceWith) {
+    super(identifier, x, y, owidth, oheight, collectable.getGameObjectImageFile());
+    this.collectable = collectable;
+    if (replaceWith != null) {
+      this.replaceWith = replaceWith;
+      this.willReplaceByAnotherGameObject = true;
+    } else {
+      this.willReplaceByAnotherGameObject = false;
+    }
+  }
+  public void PutToInventory()
+  {
+    inventoryManager.addCollectable(collectable);
+    inventoryManager.addInventoryItem(replaceWith);
+    for (int i=0; i< inventoryManager.isFull.length; i++)
+    {
+      if (inventoryManager.isFull[i] == false)
+      {
+        replaceWith.x= 100+100*i;
+        replaceWith.InvX = 100+100*i;
+        replaceWith.y=50;
+        replaceWith.InvY=50;
+        if (willReplaceByAnotherGameObject) {
+          sceneManager.getCurrentScene().addGameObject(replaceWith);
+        }
+        inventoryManager.isFull[i] = true;
+        break;
+      }
+    }
+  }
+  @Override
+    public void draw() {
+    super.draw();
+  }
+
+  @Override
+    public void mouseClicked() {
+    if (mouseIsHovering) {
+      sceneManager.getCurrentScene().removeGameObject(this);
+      this.PutToInventory();
+    }
+  }
+
+    public void mouseDragged() {
+    super.mouseDragged();
+  }
+}
+
+// class GameObject
+class GameObject {
+  protected int InvX;
+  protected int InvY;
+  protected int x;
+  protected int y;
+  protected int owidth;
+  protected int oheight;
+  private String identifier;
+  protected boolean isLetter;
+  protected boolean isEraser;
+  protected boolean isWater;
+  private boolean hasImage;
+  private boolean hasHoverImage;
+  private PImage gameObjectImage;
+  private PImage gameObjectImageHover;
+  private boolean hasCopy;
+  protected boolean mouseIsHovering;
+  protected boolean isClicked;
+  protected boolean isHolding;
+  protected GameObject replaceWith;
+  protected GameObject copy;
+  protected GameObject deleteObject;
+  protected GameObject spawnObject;
+  protected Scene scene;
+
+
+
+
+  public GameObject(String identifier, int x, int y, int owidth, int oheight) {
+    this(identifier, x, y, owidth, oheight, "", false, null);
+  }
+  public GameObject(String identifier, int owidth, int oheight, String gameObjectImageFile) {
+    this.identifier = identifier;
+    this.x = 0;
+    this.y = 0;
+    this.owidth = owidth;
+    this.oheight = oheight;
+    this.hasImage = !gameObjectImageFile.equals("");
+    if (this.hasImage) {
+      this.gameObjectImage = loadImage(gameObjectImageFile);
+    }
+  }
+
+
+  public GameObject(String identifier, int x, int y, int owidth, int oheight, String gameObjectImageFile) {
+    this.identifier = identifier;
+    this.x = x;
+    this.y = y;
+    this.owidth = owidth;
+    this.oheight = oheight;
+    this.hasImage = !gameObjectImageFile.equals("");
+    if (this.hasImage) {
+      this.gameObjectImage = loadImage(gameObjectImageFile);
+    }
+    hasHoverImage = false;
+    mouseIsHovering = false;
+  }
+
+
+  public GameObject(String identifier, int x, int y, int owidth, int oheight, String gameObjectImageFile, boolean isEraser, MoveToSceneObject deleteObject, CollectableObject spawnObject) {
+    this.identifier = identifier;
+    this.x = x;
+    this.y = y;
+    this.owidth = owidth;
+    this.oheight = oheight;
+    this.deleteObject = deleteObject;
+    this.spawnObject = spawnObject;
+    this.isEraser = isEraser;
+    this.hasImage = !gameObjectImageFile.equals("");
+    if (this.hasImage) {
+      this.gameObjectImage = loadImage(gameObjectImageFile);
+    }
+    hasHoverImage = false;
+    mouseIsHovering = false;
+  }
+
+  public GameObject(String identifier, int x, int y, int owidth, int oheight, String gameObjectImageFile, boolean isLetter, GameObject copy) {
+    this.identifier = identifier;
+    this.x = x;
+    this.y = y;
+    this.owidth = owidth;
+    this.oheight = oheight;
+    this.hasImage = !gameObjectImageFile.equals("");
+    this.isLetter = isLetter;
+    this.hasCopy = !copy.equals(null);
+    if (this.hasCopy)
+    {
+      this.copy = copy;
+    }
+
+    if (this.hasImage) {
+      this.gameObjectImage = loadImage(gameObjectImageFile);
+    }
+    hasHoverImage = false;
+    mouseIsHovering = false;
+  }
+
+  public void setHoverImage(String gameObjectImageHoverFile) {
+    this.gameObjectImageHover = loadImage(gameObjectImageHoverFile);
+    hasHoverImage = true;
+  }
+
+  public void draw() {
+    if (hasImage) {
+      if (mouseIsHovering && hasHoverImage) {
+        image(gameObjectImageHover, x, y, owidth, oheight);
+      } else {
+        image(gameObjectImage, x, y, owidth, oheight);
+      }
+    }
+  }
+
+  public void mouseMoved() {
+    mouseIsHovering = false;
+    if (mouseX >= x && mouseX <= x + owidth &&
+      mouseY >= y && mouseY <= y + oheight) {
+      mouseIsHovering = true;
+    }
+  }
+
+  public void mouseDragged()
+  {
+    //if (mouseIsHovering) {
+    //  this.x = mouseX;
+    //  this.y = mouseY;
+    //}
+  }
+  public void mouseReleased()
+  {
+    //if (mouseIsHovering) {
+    //  this.x = InvX;
+    //  this.y = InvY;
+    //}
+  }
+
+  public void mouseClicked()
+  {
+    if (mouseIsHovering) {
+      if (this.isLetter)
+      {
+        for (int i =0; i< lettersManager.hasLetter.length; i++)
+        {
+          if (lettersManager.hasLetter[i] == false)
+          {
+            this.copy.x = 650+100*i;
+            this.copy.y = 400;
+            if (hasCopy) {
+              sceneManager.getCurrentScene().addGameObject(this.copy);
+            }
+            lettersManager.hasLetter[i] = true;
+            lettersManager.word.add(this.copy);
+            lettersManager.words ++;
+            break;
+          }
+        }
+      }
+      if (this.isEraser)
+      {
+        if (lettersManager.words == lettersManager.hasLetter.length) {
+          if (lettersManager.word.get(0).getIdentifier() == "LetterGCopy" && lettersManager.word.get(1).getIdentifier() == "LetterOCopy"
+            && lettersManager.word.get(2).getIdentifier() == "LetterBCopy" && lettersManager.word.get(3).getIdentifier() == "LetterLCopy"
+            && lettersManager.word.get(4).getIdentifier() == "LetterECopy" && lettersManager.word.get(5).getIdentifier() == "LetterTCopy") {
+            sceneManager.goToPreviousScene();
+            sceneManager.getCurrentScene().removeGameObject(this.deleteObject);
+            sceneManager.getCurrentScene().addGameObject(this.spawnObject);
+          } else {
+            for (GameObject object : lettersManager.word) {
+              sceneManager.getCurrentScene().removeGameObject(object);
+              lettersManager.word = new ArrayList<GameObject>();
+              lettersManager.hasLetter = new boolean[6];
+              lettersManager.words = 0;
+            }
+          }
+        } else {
+          for (GameObject object : lettersManager.word) {
+            sceneManager.getCurrentScene().removeGameObject(object);
+            lettersManager.word = new ArrayList<GameObject>();
+            lettersManager.hasLetter = new boolean[6];
+            lettersManager.words = 0;
+          }
+        }
+      }
+    }
+  }
+  public void mousePressed()
+  {
+  }
+
+  public String getIdentifier() {
+    return this.identifier;
+  }
+
+  @Override
+    public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (obj == null || obj.getClass() != this.getClass()) {
+      return false;
+    }
+    GameObject otherGameObject = (GameObject) obj;
+    return otherGameObject.getIdentifier().equals(this.identifier);
+  }
+
+  @Override
+    public int hashCode() {
+    final int prime = 11;
+    return prime * this.identifier.hashCode();
+  }
+}
+
+//class InventoryManager
+class InventoryManager {
+  public boolean[] isFull = new boolean[5];
+  public ArrayList<GameObject> inventoryItems;
+  private ArrayList<GameObject> markedForDeathItems;
+  private ArrayList<Collectable> collectables;
+  private ArrayList<Collectable> markedForDeathCollectables;
+  public ArrayList <GameObject> bowls;
+
+
+
+  public InventoryManager() {
+    markedForDeathItems = new ArrayList<GameObject>();
+    collectables = new ArrayList<Collectable>();
+    markedForDeathCollectables = new ArrayList<Collectable>();
+    inventoryItems = new ArrayList<GameObject>();
+    bowls = new ArrayList<GameObject>();
+  }
+
+  public void addInventoryItem(GameObject item)
+  {
+    inventoryItems.add(item);
+  }
+
+  public void addCollectable(Collectable collectable) {
+    collectables.add(collectable);
+  }
+ 
+
+  public void removeCollectable(Collectable collectable) {
+    markedForDeathCollectables.add(collectable);
+  }
+  
+  public void removeInventoryItem(GameObject object){
+    markedForDeathItems.add(object);
+  }
+
+  public boolean containsCollectable(Collectable collectable) {
+    return collectables.contains(collectable);
+  }
+
+  public void clearMarkedForDeathCollectables() {
+    if (markedForDeathCollectables.size() > 0) {
+      for (Collectable collectable : markedForDeathCollectables) {
+        collectables.remove(collectable);
+      }
+      markedForDeathCollectables  = new ArrayList<Collectable>();
+    }
+  }
+  
+  public void clearMarkedForDeathItems(){
+    if (markedForDeathItems.size() > 0) {
+      for (GameObject object : markedForDeathItems) {
+        inventoryItems.remove(object);
+      }
+      markedForDeathItems  = new ArrayList<GameObject>();
+    }
+  }
+}
+
+//class LettersManager
+class LettersManager {
+  public ArrayList<GameObject> word;
+  public boolean[] hasLetter = new boolean[6];
+  public int words = 0;
+
+  public LettersManager() {
+    word = new ArrayList<GameObject>();
+
+  }
+}
+// class MoveToSceneObject
+class MoveToSceneObject extends GameObject {
+  
+  private String nextSceneIdentifier;
+  private boolean moveBack;
+  
+  public MoveToSceneObject(String identifier, int x, int y, int owidth, int oheight, boolean moveBack) {
+    this(identifier, x, y, owidth, oheight, "", moveBack);
+  }
+  
+  public MoveToSceneObject(String identifier, int x, int y, int owidth, int oheight, String gameObjectImageFile, boolean moveBack) {
+    super(identifier, x, y, owidth, oheight, gameObjectImageFile);
+    this.moveBack = moveBack;
+  }
+  
+  public MoveToSceneObject(String identifier, int x, int y, int owidth, int oheight, String nextSceneIdentifier) {
+    this(identifier, x, y, owidth, oheight, "", nextSceneIdentifier);
+  }
+  
+  public MoveToSceneObject(String identifier, int x, int y, int owidth, int oheight, String gameObjectImageFile, String nextSceneIdentifier) {
+    super(identifier, x, y, owidth, oheight, gameObjectImageFile);
+    this.nextSceneIdentifier = nextSceneIdentifier;
+    this.moveBack = false;
+  }
+  
+  @Override
+  public void mouseClicked() {
+    if(mouseIsHovering) {
+      if(moveBack) {
+        sceneManager.goToPreviousScene();
+      } else {
+        try {
+          sceneManager.goToScene(nextSceneIdentifier);
+        } catch(Exception e) { 
+          println(e.getMessage());
+        }
+      }
+    }
+  }
+}
+
+// class RequireObject
+class RequireObject extends TextObject {
+  private Collectable collectable;
+  private Collectable addCollectable;
+  private GameObject replaceWith;
+  private GameObject addObject;
+  private GameObject deleteObject;
+  private String goToScene;
+  private boolean bowl;
+  
+
+
+  public RequireObject(String identifier, int x, int y, int owidth, int oheight,
+    String gameObjectImageFile,
+    Collectable collectable, Collectable addCollectable, GameObject deleteObject, GameObject addObject) {
+    super(identifier, x, y, owidth, oheight, gameObjectImageFile, "");
+    this.collectable = collectable;
+    this.addCollectable = addCollectable;
+    this.addObject = addObject;
+    this.deleteObject = deleteObject;
+  }
+  public RequireObject(String identifier, int x, int y, int owidth, int oheight,
+    String gameObjectImageFile,
+    Collectable collectable, Collectable addCollectable, GameObject deleteObject, GameObject addObject, GameObject replaceWith, boolean bowl, String goToScene) {
+    super(identifier, x, y, owidth, oheight, gameObjectImageFile, "");
+    this.collectable = collectable;
+    this.addCollectable = addCollectable;
+    this.addObject = addObject;
+    this.deleteObject = deleteObject;
+    this.replaceWith = replaceWith;
+    this.goToScene = goToScene;
+    this.bowl = bowl;
+  }
+
+  public RequireObject(String identifier, int x, int y, int owidth, int oheight,
+    String gameObjectImageFile, String text,
+    Collectable collectable) {
+    super(identifier, x, y, owidth, oheight, gameObjectImageFile, text);
+    this.collectable = collectable;
+    this.replaceWith = replaceWith;
+  }
+
+  @Override
+    public void mouseClicked() {
+    if (mouseIsHovering && inventoryManager.containsCollectable(collectable)) {
+      inventoryManager.removeCollectable(collectable);
+      inventoryManager.addCollectable(addCollectable);
+      inventoryManager.isFull[inventoryManager.inventoryItems.indexOf(deleteObject)] = false;
+      if (this.addObject.x ==0 && this.addObject.x == 0) {
+        this.addObject.x = 100 + 100 * inventoryManager.inventoryItems.indexOf(deleteObject);
+        this.addObject.y = 50;
+      }
+      inventoryManager.removeInventoryItem(deleteObject);
+      inventoryManager.inventoryItems.add(inventoryManager.inventoryItems.indexOf(deleteObject), addObject);
+      inventoryManager.isFull[inventoryManager.inventoryItems.indexOf(deleteObject)] = true;
+      sceneManager.getCurrentScene().addGameObject(addObject);
+      sceneManager.getCurrentScene().removeGameObject(deleteObject);
+      if (this.replaceWith != null) {
+        sceneManager.getCurrentScene().removeGameObject(this);
+        sceneManager.getCurrentScene().addGameObject(this.replaceWith);
+      if (this.bowl){
+        inventoryManager.bowls.add(this.replaceWith);
+        if(inventoryManager.bowls.size() == 2){
+          try {
+          sceneManager.goToScene(goToScene);
+        } catch(Exception e) { 
+          println(e.getMessage());
+        }
+        }
+      }
+     }
+    } else {
+      super.mouseClicked();
+    }
+  }
+}
+
+//class Scene
+class Scene {
+  public GameObject gameObject;
+  private String sceneName;
+  private PImage backgroundImage;
+  private ArrayList<GameObject> gameObjects;
+  private ArrayList<GameObject> recentlyAddedGameObjects;
+  private ArrayList<GameObject> markedForDeathGameObjects;
+
+  public Scene(String sceneName, String backgroundImageFile) {
+    this.sceneName = sceneName;
+    this.backgroundImage = loadImage(backgroundImageFile);
+    gameObjects = new ArrayList<GameObject>();
+    markedForDeathGameObjects = new ArrayList<GameObject>();
+    recentlyAddedGameObjects = new ArrayList<GameObject>();
+  }
+  public GameObject checkObject(String identifier)
+  {
+    for (GameObject object : gameObjects){
+      if (object.getIdentifier() == identifier){
+        gameObject = object;
+      }
+    }
+    return gameObject;
+  }
+
+  public void addGameObject(GameObject object) {
+    recentlyAddedGameObjects.add(object);
+  }
+
+  public void removeGameObject(GameObject object) {
+    markedForDeathGameObjects.add(object);
+  }
+
+  public void updateScene() {
+    if (markedForDeathGameObjects.size() > 0) {
+      for (GameObject object : markedForDeathGameObjects) {
+        gameObjects.remove(object);
+      }
+      markedForDeathGameObjects  = new ArrayList<GameObject>();
+    }
+    if (recentlyAddedGameObjects.size() > 0) {
+      for (GameObject object : recentlyAddedGameObjects) {
+        gameObjects.add(object);
+      }
+      recentlyAddedGameObjects  = new ArrayList<GameObject>();
+    }
+    if (inventoryManager.inventoryItems.size() > 0) {
+      for (GameObject object : inventoryManager.inventoryItems) {
+        if (!gameObjects.contains(object))
+        {
+          gameObjects.add(object);
+        }
+      }
+    }
+  }
+
+  public void draw(int wwidth, int wheight) {
+    image(backgroundImage, 0, 0, wwidth, wheight);
+    for (GameObject object : gameObjects) {
+      object.draw();
+    }
+  }
+
+  public void mouseMoved() {
+    for (GameObject object : gameObjects) {
+      object.mouseMoved();
+    }
+  }
+
+  public void mouseClicked() {
+    for (GameObject object : gameObjects) {
+      object.mouseClicked();
+    }
+  }
+  public void mouseDragged() {
+    for (GameObject object : inventoryManager.inventoryItems) {
+      object.mouseDragged();
+    }
+  }
+  public void mousePressed() {
+    for (GameObject object : inventoryManager.inventoryItems) {
+      object.mousePressed();
+    }
+  }
+  public void mouseReleased() {
+    for (GameObject object : inventoryManager.inventoryItems) {
+      object.mouseReleased();  
+    }
+  }
+
+  public String getSceneName() {
+    return this.sceneName;
+  }
+}
+
+//class SceneManager
+import java.util.Stack;
+import java.util.HashMap;
+
+class SceneManager {
+  private HashMap<String, Scene> scenes;
+  private Stack<Scene> scenesStack;
+  
+  public SceneManager() {
+    scenes = new HashMap<String, Scene>();
+    scenesStack = new Stack<Scene>();
+  }
+  
+  public void addScene(Scene scene) {
+    scenes.put(scene.getSceneName(), scene);
+    if(scenesStack.size() == 0)
+    {
+      scenesStack.push(scene);
+    }
+  }
+  
+  public void goToScene(String sceneName) throws Exception {
+    if(scenes.containsKey(sceneName)) {
+      scenesStack.push(scenes.get(sceneName));
+    }
+    else {
+      throw new Exception("Scene not found with name: "+ sceneName + "." + 
+                           "Make sure it was added to the sceneManager.");
+    }
+  }
+  
+  public void goToPreviousScene() {
+    scenesStack.pop();
+  }
+  
+  public Scene getCurrentScene() {
+    return scenesStack.peek();
+  }
+}
+
+//class TextObject
+class TextObject extends GameObject {
+  private String text;
+  private boolean displayText;
+  private float textWidth;
+  private float textHeight;
+  
+  public TextObject(String identifier, int x, int y, int owidth, 
+                    int oheight, String gameObjectImageFile, String text) {
+    super(identifier, x, y, owidth, oheight, gameObjectImageFile);
+    this.text = text;
+    displayText = false;
+    calculateTextArea(); //Automatically calculates the area 
+                         //necessary to display the entire text.
+  }
+  //@Override
+  //public void draw() {
+  //  super.draw();
+  //  if(displayText) {
+  //    fill(255);
+  //    rect(this.x, this.y, textWidth + 30, textHeight, 8);
+  //    fill(0);
+  //    text(text, this.x + 15, this.y + 15, textWidth, textHeight); 
+  //  }
+  //}
+  @Override
+  public void mouseClicked() {
+    displayText = false;
+    if(mouseIsHovering) { displayText = true; }
+  }
+  
+  public void calculateTextArea() {
+    textWidth = textWidth(text);
+    float remaining = textWidth - 300;
+    textWidth = (textWidth > 300) ? 300 : textWidth;
+    textHeight = 50;
+    while(remaining > 300)
+    {
+      textHeight += 30;
+      remaining -= 300;
+    }
+  }
+}
+
+// Main Code
 int wwidth = 1920;
 int wheight = 1080;
 
